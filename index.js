@@ -4,11 +4,17 @@ const c = canvas.getContext('2d')
 canvas.width = 1024
 canvas.height = 576 
 
+
 //c.fillStyle = 'white'
 //c.fillRect(0, 0, canvas.width, canvas.height)
 const collisionsMap = []
 for (let i = 0; i < collisions.length; i += 70) {
     collisionsMap.push( collisions.slice(i,i+70) )
+}
+//for battlezones
+const regBattleMap = []
+for (let i = 0; i < regBattleData.length; i += 70) {
+    regBattleMap.push(  regBattleData.slice(i,i+70) )
 }
 
 
@@ -22,6 +28,19 @@ collisionsMap.forEach((row,i) => {
     row.forEach((symbol,j) => {
         if (symbol === 1025) { 
         boundaries.push(new Boundary({position: {
+            x: j * Boundary.width + offset.x,
+            y: i * Boundary.height + offset.y
+        }}))
+    }
+    })
+})
+
+const regBattleZ = []
+
+regBattleMap.forEach((row,i) => {
+    row.forEach((symbol,j) => {
+        if (symbol === 1025) { 
+        regBattleZ.push(new Boundary({position: {
             x: j * Boundary.width + offset.x,
             y: i * Boundary.height + offset.y
         }}))
@@ -97,7 +116,7 @@ const keys = {
 
 
 // ... = spread operator places all items from boundaries (array) into the moveable array
-const moveable = [background, ...boundaries, foreground, foreground2]
+const moveable = [background, ...boundaries, foreground, foreground2, ...regBattleZ]
 
 function rectCollision({rectangle1, rectangle2}) {
     return(
@@ -118,13 +137,40 @@ function animate() {
 
 
     })
+
+    regBattleZ.forEach(regBattleMap => {
+        regBattleMap.draw() 
+    })
+
     player.draw()
     //foreground after player !
     foreground.draw()
     foreground2.draw()
-
-
-    
+    //activate battle
+    if (keys.w.pressed || keys.s.pressed || keys.a.pressed || keys.d.pressed) {
+        //battle zone loop 
+        for (let i = 0; i < regBattleZ.length; i++) {
+            const battleZone = regBattleZ[i]
+            const overlappingArea = (Math.min(player.position.x+player.width,battleZone.position.x+battleZone.width) - 
+            Math.max(player.position.x,battleZone.position.x)) * (
+            Math.min(player.position.y + player.height, battleZone.position.y + battleZone.height) - 
+            Math.max(player.position.y, battleZone.position.y) )
+            if (
+                rectCollision({
+                    rectangle1: player,
+                    //clone of boundary object
+                    rectangle2: battleZone
+             }) &&
+             overlappingArea > (player.width * player.height) / 2
+             &&
+             Math.random() < 0.01
+            ) {
+                console.log("Battle")
+                break
+            }
+        }   
+    }
+     
 
     
 
@@ -146,7 +192,6 @@ function animate() {
                     }}
                 })
             ) {
-                console.log("WODNAOHj")
                 moving = false
                 break
             }
@@ -157,6 +202,7 @@ function animate() {
     else if (keys.s.pressed && lastKey == 's') { 
         player.moving = true
         player.image = player.sprites.down
+        //boundary loop
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -169,7 +215,6 @@ function animate() {
                     }}
                 })
             ) {
-                console.log("WODNAOHj")
                 moving = false
                 break
             }
@@ -192,7 +237,6 @@ function animate() {
                     }}
                 })
             ) {
-                console.log("WODNAOHj")
                 moving = false
                 break
             }
@@ -215,7 +259,6 @@ function animate() {
                     }}
                 })
             ) {
-                console.log("WODNAOHj")
                 moving = false
                 break
             }
