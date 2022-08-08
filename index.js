@@ -1,3 +1,5 @@
+//align-items (middle of y-axis), justify-content (middle of x-axis)
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -68,9 +70,6 @@ playerLeftImg.src = './img/playerLeftBB.png'
 
 const playerRightImg = new Image()
 playerRightImg.src = './img/playerRightBB.png'
-
-
-
 
 
 const player = new Sprite ( {
@@ -151,7 +150,7 @@ function animate() {
     foreground2.draw()  
 
     let moving  = true
-    player.moving = false
+    player.animate = false
 
     //if battle there should be no moving
     if(battle.init) return
@@ -197,8 +196,6 @@ function animate() {
                         })
                     }
                 })
-
-
                 break
             }
         }   
@@ -207,9 +204,9 @@ function animate() {
 
 
     //moving  = true
-    //player.moving = false
+    //player.animate = false
     if (keys.w.pressed && lastKey == 'w') {
-        player.moving = true
+        player.animate = true
         player.image = player.sprites.up
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
@@ -231,7 +228,7 @@ function animate() {
             moveable.forEach(moveable => {moveable.position.y += 3}) 
     }
     else if (keys.s.pressed && lastKey == 's') { 
-        player.moving = true
+        player.animate = true
         player.image = player.sprites.down
         //boundary loop
         for (let i = 0; i < boundaries.length; i++) {
@@ -254,7 +251,7 @@ function animate() {
             moveable.forEach(moveable => {moveable.position.y -= 3}) 
     }
     else if (keys.a.pressed && lastKey == 'a') { 
-        player.moving = true
+        player.animate = true
         player.image = player.sprites.left
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
@@ -276,7 +273,7 @@ function animate() {
             moveable.forEach(moveable => {moveable.position.x += 3}) 
     }
     else if (keys.d.pressed && lastKey == 'd') { 
-        player.moving = true
+        player.animate = true
         player.image = player.sprites.right
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
@@ -310,9 +307,42 @@ position: {
     image: battleBackgroundImg
 })
 
+const gusImg = new Image()
+gusImg.src = './img/enemyGus.png'
+
+const gus = new Sprite({
+    position: {
+        x: 800,
+        y: 100
+    },
+    image: gusImg,
+    frames: {
+        max: 4
+    }
+})
+
+const waltImg = new Image()
+waltImg.src = './img/playerWalt.png'
+
+const walt = new Sprite({
+    position: {
+        x: 280,
+        y: 325
+    },
+    image: waltImg,
+    frames: {
+        max: 4
+    }
+})
+
 function animateBattle() { 
-    window.requestAnimationFrame(animateBattle)
+    window.requestAnimationFrame(animateBattle)    
     battleBackground.draw()
+    gus.draw()
+    walt.draw()
+    walt.animate = true
+    gus.animate = true
+
 }
 
 let lastKey = ''

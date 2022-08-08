@@ -1,5 +1,5 @@
 class Sprite {
-    constructor({position, image, frames = {max: 1}, sprites }) {
+    constructor({position, image, frames = {max: 1}, sprites, animate = false }) {
         this.position = position
         this.image = image 
         //frames are defaulted to one, used to crop the apporpriate amount 
@@ -10,7 +10,7 @@ class Sprite {
             this.height = this.image.height 
 
         }
-        this.moving = false 
+        this.animate = false 
         this.sprites = sprites
     }
 
@@ -29,7 +29,7 @@ class Sprite {
             this.image.height
             )
             
-            if (!this.moving) return
+            if (!this.animate) return
 
             if (this.frames.max > 1) {
                 this.frames.elapsed++ 
