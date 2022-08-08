@@ -342,8 +342,21 @@ function animateBattle() {
     walt.draw()
     walt.animate = true
     gus.animate = true
+    gus.isEnemy = true
 
 }
+//addeventListneer defaults to window.addeventlistener so make it button
+//loops thru buttons
+document.querySelectorAll('button').forEach(button => {
+    //arrow function is how we respond to the click
+    button.addEventListener('click', () => {
+        walt.attack({
+            attack: {name: 'punch', damage: 10, type: 'Normal'},
+            recpient: gus
+        })
+    })
+})
+
 
 let lastKey = ''
 window.addEventListener('keydown', (e) => {
