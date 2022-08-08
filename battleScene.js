@@ -37,6 +37,37 @@ const walt = new Sprite({
 })
 
 
+let battleAnimationId
+function animateBattle() { 
+    battleAnimationId = window.requestAnimationFrame(animateBattle)    
+    battleBackground.draw()
+    gus.draw()
+    walt.draw()
+    walt.animate = true
+    gus.animate = true
+    gus.isEnemy = true
+    walt.name = 'Walt'
+    gus.name = 'Gus'
+
+}
+
+function transition() {
+    gsap.to('#overlapDiv', {
+        opacity: 1,
+        onComplete: () => {
+            cancelAnimationFrame(battleAnimationId)
+            battle.init = false
+            animate()
+            gsap.to('#overlapDiv', {
+                opacity: 0,
+                display: 'none'
+            })
+        }
+    })
+    return
+        
+}
+
 function gusFaint() {
     document.querySelector('#words').style.display = 'block'
     document.querySelector('#words').innerHTML = "Gus died!"
@@ -46,7 +77,11 @@ function gusFaint() {
     gsap.to(gus, {
         opacity: 0
     })
+
+
+
     transition()
+
 }
 
 function waltFaint() {
@@ -60,20 +95,6 @@ function waltFaint() {
     })
     transition()
 }
-
-function animateBattle() { 
-    window.requestAnimationFrame(animateBattle)    
-    battleBackground.draw()
-    gus.draw()
-    walt.draw()
-    walt.animate = true
-    gus.animate = true
-    gus.isEnemy = true
-    walt.name = 'Walt'
-    gus.name = 'Gus'
-
-}
-
 
 //if multiple attacks use queue for enemy attacks 
 const q = []
@@ -100,12 +121,11 @@ document.querySelectorAll('button').forEach(button => {
 
 
     })
-
 })
   
 document.querySelector('#words').addEventListener('click', (e) => {
     if (q.length > 0) {
-        //causes the enemy to attack
+        //causes the enemy to attack also check health
         if(gus.health <= 0) {
             gusFaint()
             return
@@ -119,7 +139,6 @@ document.querySelector('#words').addEventListener('click', (e) => {
     } else {
         e.currentTarget.style.display = 'none'
     } 
-    //attacks happen here so check for health 
 
   
     
