@@ -185,6 +185,7 @@ function animate() {
                 audio.Map.stop()
                 audio.battle.play()
                 battle.init = true
+                audioStart = true
                 //flashing black screen 
                 gsap.to('#overlapDiv', {
                     opacity: 1,
