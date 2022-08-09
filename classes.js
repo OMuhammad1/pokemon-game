@@ -1,5 +1,5 @@
 class Sprite {
-    constructor({position, image, frames = {max: 1}, sprites, animate = false, isEnemy = false }) {
+    constructor({position, image, frames = {max: 1}, sprites, animate = false, isEnemy = false, name }) {
         this.position = position
         this.image = image 
         //frames are defaulted to one, used to crop the apporpriate amount 
@@ -15,6 +15,7 @@ class Sprite {
         this.opacity = 1
         this.health = 100
         this.isEnemy = this.isEnemy
+        this.name = name
     }
 
     draw() {
@@ -49,9 +50,11 @@ class Sprite {
         }
     
     }
-
+    //More attacks can easily be added in the future 
     attack({attack, recpient}) {
-        this.health -= attack.damage
+        document.querySelector('#words').style.display = 'block'
+        document.querySelector('#words').innerHTML = this.name + ' ' + attack.name + ' ' + recpient.name
+        recpient.health -= attack.damage
         const tl = gsap.timeline()
 
         let movementDistance = 20
@@ -59,7 +62,6 @@ class Sprite {
 
         let healthBar = '#gusHealth'
         if (this.isEnemy) healthBar = '#waltHealth'
-
         tl.to(this.position, {
             x: this.position.x  - movementDistance
         }).to(this.position, {
@@ -68,7 +70,7 @@ class Sprite {
             onComplete: () => {
                 //enemy gets hit, use '#' to refer to html id
                 gsap.to(healthBar, {
-                    width: this.health + '%',
+                    width: recpient.health + '%', 
                 })
                 gsap.to(recpient.position, {
                     x: recpient.position.x + 10,
@@ -82,10 +84,13 @@ class Sprite {
                     repeat: 5,
                     duration: 0.07
                 })
+                audio.hit.play()
             }
         }).to(this.position, {
             x:this.position.x 
         })
+
+   
     }
 
 }  
@@ -102,7 +107,7 @@ class Boundary {
     }
 
     draw() {
-        c.fillStyle = 'rgba(255,0,0,0.3)'
+        c.fillStyle = 'rgba(255,0,0,0)'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 }

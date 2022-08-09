@@ -1,45 +1,95 @@
 const battleBackgroundImg = new Image()
 battleBackgroundImg.src = './img/battleBackground.png'
 const battleBackground = new Sprite({
-position: {
-    x: 0,
-    y: 0
-},
+    position: {
+        x: 0,
+        y: 0
+    },
     image: battleBackgroundImg
 })
 
-const gusImg = new Image()
-gusImg.src = './img/enemyGus.png'
-
-const gus = new Sprite({
-    position: {
-        x: 800,
-        y: 100
-    },
-    image: gusImg,
-    frames: {
-        max: 4
-    }
-})
-
-const waltImg = new Image()
-waltImg.src = './img/playerWalt.png'
-
-const walt = new Sprite({
-    position: {
-        x: 280,
-        y: 325
-    },
-    image: waltImg,
-    frames: {
-        max: 4
-    }
-})
 
 
+let gus
+let walt
+let q
 let battleAnimationId
-function animateBattle() { 
-    battleAnimationId = window.requestAnimationFrame(animateBattle)    
+
+
+
+
+
+
+function initBattle() {
+    document.querySelector('#ui').style.display = 'block'
+    document.querySelector('#words').style.display = 'none'
+    document.querySelector('#gusHealth').style.width = '100%'
+    document.querySelector('#waltHealth').style.width = '100%'
+
+
+
+
+
+    const gusImg = new Image()
+    gusImg.src = './img/enemyGus.png'
+
+    const waltImg = new Image()
+    waltImg.src = './img/playerWalt.png'
+
+    gus = new Sprite({
+        position: {
+            x: 800,
+            y: 100
+        },
+        image: gusImg,
+        frames: {
+            max: 4
+        }
+    })
+
+    walt = new Sprite({
+        position: {
+            x: 280,
+            y: 325
+        },
+        image: waltImg,
+        frames: {
+            max: 4
+        }
+    })
+
+    //if multiple attacks use queue for enemy attacks 
+    q = []
+
+    //addeventListneer defaults to window.addeventlistener so make it button
+    //loops thru buttons
+    document.querySelectorAll('button').forEach(button => {
+        //arrow function is how we respond to the click
+        button.addEventListener('click', () => {
+            walt.attack({
+                attack: { name: 'punched', damage: 20, type: 'Normal' },
+                recpient: gus
+            })
+            q.push(() => {
+                gus.attack({
+                    attack: { name: 'punched', damage: 24, type: 'Normal' },
+                    recpient: walt
+                })
+            })
+        })
+
+        button.addEventListener('mouseenter', (e) => {
+            document.querySelector('#attackType').innerHTML = 'Normal'
+            document.querySelector('#attackType').style.color = 'green'
+
+
+        })
+    })
+}
+
+
+function animateBattle() {
+    battleAnimationId = window.requestAnimationFrame(animateBattle)
     battleBackground.draw()
     gus.draw()
     walt.draw()
@@ -56,16 +106,18 @@ function transition() {
         opacity: 1,
         onComplete: () => {
             cancelAnimationFrame(battleAnimationId)
-            battle.init = false
             animate()
+            battle.init = false
+            audio.battle.stop()
+            audio.Map.play()
+            document.querySelector('#ui').style.display = 'none'
             gsap.to('#overlapDiv', {
-                opacity: 0,
-                display: 'none'
+                opacity: 0
             })
         }
     })
     return
-        
+
 }
 
 function gusFaint() {
@@ -96,51 +148,20 @@ function waltFaint() {
     transition()
 }
 
-//if multiple attacks use queue for enemy attacks 
-const q = []
-//addeventListneer defaults to window.addeventlistener so make it button
-//loops thru buttons
-document.querySelectorAll('button').forEach(button => {
-    //arrow function is how we respond to the click
-    button.addEventListener('click', () => {
-        walt.attack({
-            attack: {name: 'punched', damage: 100, type: 'Normal'},
-            recpient: gus
-        })
-        q.push(() => {
-            gus.attack({
-                attack: {name: 'punched', damage: 100, type: 'Normal'},
-                recpient: walt
-            })
-        })
-    })
-
-    button.addEventListener('mouseenter', (e) => {
-        document.querySelector('#attackType').innerHTML = 'Normal'
-        document.querySelector('#attackType').style.color = 'green'
-
-
-    })
-})
-  
 document.querySelector('#words').addEventListener('click', (e) => {
     if (q.length > 0) {
         //causes the enemy to attack also check health
-        if(gus.health <= 0) {
+        if (gus.health <= 0) {
             gusFaint()
             return
         }
         q[0]()
         q.shift()
-        if(walt.health <= 0) {
+        if (walt.health <= 0) {
             waltFaint()
             return
         }
     } else {
         e.currentTarget.style.display = 'none'
-    } 
-
-  
-    
-
+    }
 })

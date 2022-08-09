@@ -1,10 +1,14 @@
 //align-items (middle of y-axis), justify-content (middle of x-axis)
+//Notes: attacks are currently statically placed, can be changed to dynamically placing them with edits to 
+//index.html and battleScene.js
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
 canvas.width = 1024
 canvas.height = 576 
+
+document.querySelector('#ui').style.display = 'none'
 
 
 //c.fillStyle = 'white'
@@ -128,11 +132,13 @@ function rectCollision({rectangle1, rectangle2}) {
 
 const battle = {
     init: false
+
 }
 function animate() {
     //makes infinite loop for animation
     const animationId = window.requestAnimationFrame(animate)
     background.draw()
+
 
     boundaries.forEach(boundary => {
         boundary.draw()
@@ -176,6 +182,8 @@ function animate() {
             ) {
                 //deactivate current animation
                 window.cancelAnimationFrame(animationId)
+                audio.Map.stop()
+                audio.battle.play()
                 battle.init = true
                 //flashing black screen 
                 gsap.to('#overlapDiv', {
@@ -189,6 +197,7 @@ function animate() {
                             duration: 0.4
                         })
                         //battle animation loop 
+                        initBattle()
                         animateBattle()
                         gsap.to('#overlapDiv', {
                             opacity: 0,
@@ -297,67 +306,6 @@ function animate() {
 }
 animate()
 
-const battleBackgroundImg = new Image()
-battleBackgroundImg.src = './img/battleBackground.png'
-const battleBackground = new Sprite({
-position: {
-    x: 0,
-    y: 0
-},
-    image: battleBackgroundImg
-})
-
-const gusImg = new Image()
-gusImg.src = './img/enemyGus.png'
-
-const gus = new Sprite({
-    position: {
-        x: 800,
-        y: 100
-    },
-    image: gusImg,
-    frames: {
-        max: 4
-    }
-})
-
-const waltImg = new Image()
-waltImg.src = './img/playerWalt.png'
-
-const walt = new Sprite({
-    position: {
-        x: 280,
-        y: 325
-    },
-    image: waltImg,
-    frames: {
-        max: 4
-    }
-})
-
-function animateBattle() { 
-    window.requestAnimationFrame(animateBattle)    
-    battleBackground.draw()
-    gus.draw()
-    walt.draw()
-    walt.animate = true
-    gus.animate = true
-    gus.isEnemy = true
-
-}
-//addeventListneer defaults to window.addeventlistener so make it button
-//loops thru buttons
-document.querySelectorAll('button').forEach(button => {
-    //arrow function is how we respond to the click
-    button.addEventListener('click', () => {
-        walt.attack({
-            attack: {name: 'punch', damage: 10, type: 'Normal'},
-            recpient: gus
-        })
-    })
-})
-
-
 let lastKey = ''
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
@@ -397,7 +345,13 @@ window.addEventListener('keyup', (e) => {
     }
 })
 
-
+let audioStart = false 
+addEventListener('click', () => {
+    if (!audioStart) {
+        audio.Map.play()
+        audioStart = true
+    }
+    })
 
 
 
